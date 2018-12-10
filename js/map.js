@@ -1,8 +1,8 @@
 'use strict';
 
 var hosts = [];
-var TITLE_VARIANTS = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало недалеко от моря', 'Неуютное бунгало по колено в воде'];
-var CHECK_TIME_VARIANTS = ['12:00', '13:00', '14:00'];
+//var TITLE_VARIANTS = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало недалеко от моря', 'Неуютное бунгало по колено в воде'];
+//var CHECK_TIME_VARIANTS = ['12:00', '13:00', '14:00'];
 var TYPE_VARIANTS = {
   'palace': 'Дворец',
   'flat': 'Квартира',
@@ -69,34 +69,25 @@ var randomObjectKey = function (obj) {
   return keys[keys.length * Math.random() << 0];
 };
 
-for (var i = 0; i < PIN_QUANTITY; i++) {
-  var randomX = randomNumber(MAP_FIELD.width.max, MAP_FIELD.width.min);
-  var randomY = randomNumber(MAP_FIELD.height.max, MAP_FIELD.height.min);
-  var host = {
-    author: {
-      avatar: 'img/avatars/user0' + (i + 1) + '.png'
-    },
-    location: {
-      x: randomX,
-      y: randomY,
-    },
-    offer: {
-      title: TITLE_VARIANTS[i],
-      adress: randomX + ',' + randomY,
-      price: randomNumber(PRICE_VARIANTS.max, PRICE_VARIANTS.min),
-      type: randomObjectKey(TYPE_VARIANTS),
-      rooms: randomNumber(ROOMS_VARIANTS.max, ROOMS_VARIANTS.min),
-      guests: randomNumber(GUESTS_VARIANTS.max, GUESTS_VARIANTS.min),
-      checkin: CHECK_TIME_VARIANTS[randomNumber((CHECK_TIME_VARIANTS.length - 1), 0)],
-      checkout: CHECK_TIME_VARIANTS[randomNumber((CHECK_TIME_VARIANTS.length - 1), 0)],
-      features: randomArray(FEATURES_VARIANTS),
-      description: '',
-      photos: ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg']
-    }
+//Загрузка данных об объектах
+var DATAURL = 'https://js.dump.academy/keksobooking/data';
+window.load = function (onSuccess, onError) {
+  var xhr = new XMLHttpRequest();
+  xhr.responseType = 'json';
+  xhr.open('GET', DATAURL);
+  xhr.addEventListener('load', function () {
+    onSuccess(xhr.response);
+  });
+  xhr.send();
+};
 
-  };
-  hosts[i] = host;
-}
+window.load(function (newHosts) {
+  for (var i = 0; i < newHosts.length; i++) {
+    hosts[i] = newHosts[i];
+  }
+});
+
+
 var map = document.querySelector('.map');
 
 //Отрисовка меток на карте
@@ -163,19 +154,27 @@ var fillMainCard = function (pinNumber) {
   }
   map.insertBefore(mainCard, map.children[1]);
 
-  var onPinCloseClick = mainCard.children[1];
-  onPinCloseClick.addEventListener('click', function (evt) {
-    mainCard.classList.add('hidden');
-  });
-  if (mainCard) {
-    document.addEventListener('keydown', function (evt) {
-      if (evt.keyCode === ESC_KEYCODE) {
-        mainCard.classList.add('hidden');
-      }
-    });
-  }
+  window.mainCard = mainCard;
+
+  var onPinCloseClick = document.querySelector('.popup__close');
+  onPinCloseClick.setAttribute('tabindex', '0');
+  onPinCloseClick.addEventListener('click', onClickClosePopup);
+  document.addEventListener('keydown', onEscClosePopup);
 };
 
+//Закрытие popup по клику и по ESC
+
+var onClickClosePopup = function (evt) {
+  window.mainCard.classList.add('hidden');
+  document.removeEventListener('keydown', onEscClosePopup);
+};
+
+var onEscClosePopup = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    window.mainCard.classList.add('hidden');
+    document.removeEventListener('keydown', onEscClosePopup);
+  }
+};
 
 //Активное-неактивное состояние форм
 var noticeFieldsets = document.querySelectorAll('.ad-form>fieldset');
@@ -224,11 +223,11 @@ var fillAdress = function (iconX, iconY) {
 var activeModeOn = function () {
   map.classList.remove('map--faded');
   mapFiltersForm.classList.remove('map__filters--disabled');
+  pinDrawing(8);
   noticeForm.classList.remove('ad-form--disabled');
   noticeFieldsets.forEach(function (element) {
     element.disabled = '';
   });
-  pinDrawing(8);
 };
 
 var onMainPinClick = document.querySelector('.map__pin--main');
@@ -253,12 +252,14 @@ mapPins.addEventListener('click', function (event) {
 });
 
 
+
 //Валидация формы
 //Заголовок объявления
 var adTitle = document.querySelector('#title');
 adTitle.setAttribute('required', 'required');
-adTitle.setAttribute('minlength', '30');
+adTitle.setAttribute('minlength', '3');
 adTitle.setAttribute('maxlength', '100');
+
 
 //Цена за ночь
 var adPrice = document.querySelector('#price');
@@ -293,16 +294,24 @@ adCheckIn.addEventListener('change', function (evt) {
 //Количество комнат/количество мест
 var adRoomNumber = document.querySelector('#room_number');
 var adCapacity = document.querySelector('#capacity');
-adRoomNumber.addEventListener('change', function (evt) {
-  var checkedRoomNumber = parseInt(evt.target.value);
+var checkedRoomNumber = document.querySelector('#room_number>option:checked').value;
+var setAvailibleCapacity = function () {
   var checkedRoomIndex = checkedRoomNumber % 10;
   Array.prototype.forEach.call(adCapacity.children, function (element) {
     element.removeAttribute('selected', 'selected');
     element.setAttribute('disabled', 'disabled');
     if (element.value == checkedRoomIndex || element.value < checkedRoomIndex && element.value > 0) {
       element.removeAttribute('disabled', 'disabled');
+      element.setAttribute('selected', 'selected');
     }
   });
+}
+
+setAvailibleCapacity();
+
+adRoomNumber.addEventListener('change', function (evt) {
+  checkedRoomNumber = parseInt(evt.target.value);
+  setAvailibleCapacity();
 });
 
 //Отправка формы
@@ -315,24 +324,53 @@ noticeFieldsets.forEach(function (element) {
   });
 });
 
+//Закрытие сообщения об успешной отправке формы по клавише Esc и по клику
+var onEscClose = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    main.removeChild(successMessage);
+    document.removeEventListener('keydown', onEscClose);
+  }
+};
+var onClickClose = function (evt) {
+  main.removeChild(successMessage);
+  successMessage.removeEventListener('click', onClickClose);
+  document.removeEventListener('keydown', onEscClose);
+};
+
+//Сообщение об успешной отправке формы
 var successMessage = document.querySelector('#success').content.querySelector('div');
 adForm.addEventListener('submit', function (evt) {
+  window.upload(new FormData(adForm), function (response) {
+    main.appendChild(successMessage);
+    document.addEventListener('keydown', onEscClose);
+    successMessage.addEventListener('click', onClickClose);
+    adForm.reset();
+    activeModeOff();
+    fillAdress(parseFloat(onMainPinClick.style.left), parseFloat(onMainPinClick.style.top));
+  });
   evt.preventDefault();
-  main.appendChild(successMessage);
-  if (successMessage) {
-    document.addEventListener('keydown', function (evt) {
-      if (evt.keyCode === ESC_KEYCODE) {
-        main.removeChild(successMessage);
-      }
-    });
-    document.addEventListener('click', function (evt) {
-      main.removeChild(successMessage);
-    });
-  }
-  adForm.reset();
-  activeModeOff();
-  fillAdress(parseFloat(onMainPinClick.style.left), parseFloat(onMainPinClick.style.top));
 });
+
+//Отправка формы
+var URL = 'https://js.dump.academy/keksobooking';
+window.upload = function (data, onSuccess, onError) {
+  var xhr = new XMLHttpRequest();
+  xhr.responseType = 'json';
+  xhr.addEventListener('load', function () {
+    if (xhr.status === 200) {
+      onSuccess(xhr.response);
+    } else {
+      onError(xhr.status);
+    };
+  });
+  xhr.open('POST', URL);
+  xhr.send(data);
+};
+
+
+
+
+//Очистка формы по нажатию на reset
 var resetButton = document.querySelector('button[type=reset]');
 resetButton.addEventListener('click', function (evt) {
   evt.preventDefault();
