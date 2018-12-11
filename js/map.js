@@ -156,9 +156,9 @@ var fillMainCard = function (pinNumber) {
 
   window.mainCard = mainCard;
 
-  var onPinCloseClick = document.querySelector('.popup__close');
-  onPinCloseClick.setAttribute('tabindex', '0');
-  onPinCloseClick.addEventListener('click', onClickClosePopup);
+  var onPopupCloseClick = document.querySelector('.popup__close');
+  onPopupCloseClick.setAttribute('tabindex', '0');
+  onPopupCloseClick.addEventListener('click', onClickClosePopup);
   document.addEventListener('keydown', onEscClosePopup);
 };
 
@@ -219,7 +219,7 @@ var fillAdress = function (iconX, iconY) {
 };
 
 
-//Переход в активное состояние по клику на основную иконку
+//Переход в активное состояние по перетаскиванию основной иконки
 var activeModeOn = function () {
   map.classList.remove('map--faded');
   mapFiltersForm.classList.remove('map__filters--disabled');
@@ -231,25 +231,73 @@ var activeModeOn = function () {
 };
 
 var onMainPinClick = document.querySelector('.map__pin--main');
-onMainPinClick.addEventListener('mouseup', function () {
-  activeModeOn();
-  fillAdress(parseFloat(onMainPinClick.style.left), parseFloat(onMainPinClick.style.top));
+onMainPinClick.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+  console.log('down сработал');
+  var startCoordinates = {
+    x: parseFloat(onMainPinClick.style.left),
+    y: parseFloat(onMainPinClick.style.top)
+  };
+
+  var onMouseMove = function (moveEvt) {
+    //moveEvt.preventDefault();
+    console.log('мув сработал');
+    var shift = {
+      x: startCoordinates.x - moveEvt.clientX,
+      y: startCoordinates.y - moveEvt.clientY
+    };
+    startCoordinates = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+    onMainPinClick.style.top = (onMainPinClick.offsetTop - shift.y) + 'px';
+    onMainPinClick.style.left = (onMainPinClick.offsetLeft - shift.x) + 'px';
+    fillAdress(startCoordinates.x, startCoordinates.y);
+    console.log(startCoordinates);
+  }
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+    console.log(startCoordinates);
+    console.log('up сработал');
+    var shift = {
+      x: startCoordinates.x - upEvt.clientX,
+      y: startCoordinates.y - upEvt.clientY
+    };
+
+    startCoordinates = {
+      x: upEvt.clientX,
+      y: upEvt.clientY
+    };
+    onMainPinClick.style.top = (onMainPinClick.offsetTop - shift.y) + 'px';
+    onMainPinClick.style.left = (onMainPinClick.offsetLeft - shift.x) + 'px';
+    fillAdress(startCoordinates.x, startCoordinates.y);
+    activeModeOn();
+    onMainPinClick.removeEventListener('mousemove', onMouseMove);
+    onMainPinClick.removeEventListener('mouseup', onMouseUp);
+  }
+
+  onMainPinClick.addEventListener('mousemove', onMouseMove);
+  onMainPinClick.addEventListener('mouseup', onMouseUp);
 });
+
 
 //Заполнение карточки выбранной метки по клику
 var DISABLE_ELEMENTS_QUANTITY = 2;
-mapPins.addEventListener('click', function (event) {
-  var target = event.target;
-  if (!(target.type === 'button')) {
-    target = target.parentElement;
-  }
-  Array.prototype.forEach.call(mapPins.children, function (element, index) {
-    if (element === target) {
-      var pinIndex = (index < 2) ? 0 : (index - DISABLE_ELEMENTS_QUANTITY);
-      fillMainCard(pinIndex);
-    }
-  });
-});
+var newMapPins = document.querySelectorAll('button.map__pin:not(.map__pin--main)');
+//mapPins.addEventListener('click', function (event) {
+//  console.log(newMapPins);
+//  var target = event.target;
+//  if (!(target.type === 'button')) {
+//    target = target.parentElement;
+///  }
+//  Array.prototype.forEach.call(mapPins.children, function (element, index) {
+//    if (element === target) {
+//      var pinIndex = (index < 2) ? 0 : (index - DISABLE_ELEMENTS_QUANTITY);
+//      fillMainCard(pinIndex);
+//    }
+//  });
+//});
 
 
 
@@ -325,16 +373,16 @@ noticeFieldsets.forEach(function (element) {
 });
 
 //Закрытие сообщения об успешной отправке формы по клавише Esc и по клику
-var onEscClose = function (evt) {
+var onEscCloseMessage = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
     main.removeChild(successMessage);
-    document.removeEventListener('keydown', onEscClose);
+    document.removeEventListener('keydown', onEscCloseMessage);
   }
 };
-var onClickClose = function (evt) {
+var onClickCloseMessage = function (evt) {
   main.removeChild(successMessage);
-  successMessage.removeEventListener('click', onClickClose);
-  document.removeEventListener('keydown', onEscClose);
+  successMessage.removeEventListener('click', onClickCloseMessage);
+  document.removeEventListener('keydown', onEscCloseMessage);
 };
 
 //Сообщение об успешной отправке формы
@@ -342,8 +390,8 @@ var successMessage = document.querySelector('#success').content.querySelector('d
 adForm.addEventListener('submit', function (evt) {
   window.upload(new FormData(adForm), function (response) {
     main.appendChild(successMessage);
-    document.addEventListener('keydown', onEscClose);
-    successMessage.addEventListener('click', onClickClose);
+    document.addEventListener('keydown', onEscCloseMessage);
+    successMessage.addEventListener('click', onClickCloseMessage);
     adForm.reset();
     activeModeOff();
     fillAdress(parseFloat(onMainPinClick.style.left), parseFloat(onMainPinClick.style.top));
