@@ -7,7 +7,6 @@
     height: 70
   };
   window.PIN = PIN;
-  var PIN_QUANTITY = 8;
   var mapPins = document.querySelector('.map__pins');
   var pinTemplate = document.querySelector('#pin').content.querySelector('button');
   var fragment = document.createDocumentFragment();
@@ -73,7 +72,6 @@
     window.mainCard = mainCard;
   };
 
-
   //Заполнение карточки выбранной метки по клику
 
   var DISABLE_ELEMENTS_QUANTITY = 2;
@@ -84,12 +82,13 @@
     }
     Array.prototype.forEach.call(mapPins.children, function (element, index) {
       if ((element === target) && (index > 1)) {
+        console.log((element === target) && (index > 1));
+        console.log(element,index);
         fillMainCard(index - DISABLE_ELEMENTS_QUANTITY);
         closePopup();
       }
     });
   };
-
   mapPins.addEventListener('click', onPinClickOpenPopup);
 
   //Закрытие popup по клику и по ESC

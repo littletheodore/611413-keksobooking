@@ -23,7 +23,7 @@
     },
   };
 
-  window.mainPin.addEventListener('mousedown', function (evt) {
+  var onMouseDown = function (evt) {
     evt.preventDefault();
     var startCoordinates = {
       x: evt.clientX,
@@ -71,7 +71,7 @@
       window.mapActiveModeOn();
       window.mainPin.removeEventListener('mousemove', onMouseMove);
       window.mainPin.removeEventListener('mouseup', onMouseUp);
-
+      window.mainPin.removeEventListener('mousedown', onMouseDown);
     };
     var ifIncorrectCoords = function (newCoords) {
       if ((newCoords.X > MAP_FIELD.width.max) || (newCoords.X < MAP_FIELD.width.min)) {
@@ -84,5 +84,8 @@
     };
     window.mainPin.addEventListener('mousemove', onMouseMove);
     window.mainPin.addEventListener('mouseup', onMouseUp);
-  });
+  };
+
+  window.mainPin.addEventListener('mousedown', onMouseDown);
+
 })();
