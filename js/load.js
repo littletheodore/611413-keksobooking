@@ -20,4 +20,5 @@
     }
     window.load.hosts = hosts;
   });
+  console.log(window.load.hosts);
 })();

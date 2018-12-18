@@ -11,7 +11,7 @@
   var MAIN_ICON_INDEX = 0;
   var map = document.querySelector('.map');
   window.map = map;
-  var PIN_QUANTITY = 8;
+  var PIN_QUANTITY = 5;
   var MAIN_PIN_START_COORDS = {
     X: parseFloat(window.mainPin.style.left),
     Y: parseFloat(window.mainPin.style.top)
@@ -49,7 +49,8 @@
   var mapActiveModeOn = function () {
     map.classList.remove('map--faded');
     mapFiltersForm.classList.remove('map__filters--disabled');
-    window.pinDrawing(PIN_QUANTITY);
+    window.pinDrawing(window.load.hosts, PIN_QUANTITY);
+    window.popupAppear(window.load.hosts);
     noticeForm.classList.remove('ad-form--disabled');
     noticeFieldsets.forEach(function (element) {
       element.disabled = '';
