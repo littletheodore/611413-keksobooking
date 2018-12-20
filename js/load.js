@@ -15,13 +15,11 @@
       }
     });
     xhr.send();
-
-    xhr.addEventListener('error', function (xhr) {
+    xhr.addEventListener('error', function () {
       onError('Произошла ошибка ' + xhr.status);
     });
-
     var TIMEOUT = 10000;
-    xhr.addEventListener('timeout', function (xhr) {
+    xhr.addEventListener('timeout', function () {
       if (xhr.timeout > TIMEOUT) {
         onError('Сервер не отвечает в течение' + xhr.timeout + 'секунд');
       }

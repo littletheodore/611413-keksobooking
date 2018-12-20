@@ -59,8 +59,8 @@
       document.addEventListener('keydown', onEscCloseSuccessMessage);
       successMessage.addEventListener('click', onClickCloseSuccessMessage);
       adForm.reset();
-      window.mapActiveModeOff();
-      window.fillAdress(window.MAIN_PIN_START_COORDS.X, window.MAIN_PIN_START_COORDS.Y);
+      window.map.activeModeOff();
+      window.mainPin.fillAdress(window.map.MAIN_PIN_START_COORDS.X, window.map.MAIN_PIN_START_COORDS.Y);
     });
     evt.preventDefault();
   });

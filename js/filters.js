@@ -1,6 +1,5 @@
 'use strict';
 (function () {
-  var MAIN_ICON_INDEX = 0;
   var filtersForm = document.querySelector('.map__filters');
   var userFilter = {
     'housing-type': 'any',
@@ -30,21 +29,15 @@
     });
     var popup = document.querySelector('article.popup');
     if (popup) {
-      window.map.removeChild(popup);
+      window.map.map.removeChild(popup);
     }
-    var pins = document.querySelectorAll('button.map__pin');
-    pins.forEach(function (element, index) {
-      if (index !== MAIN_ICON_INDEX) {
-        window.mapPins.removeChild(element);
-      }
-    });
     var arrayCompare = function (firstArray, secondArray) {
       var asd = [];
       firstArray.forEach(function (element1) {
         var sameElements = secondArray.filter(function (element2) {
           return element1 === element2;
         });
-        if (sameElements != 0) {
+        if (sameElements.length !== 0) {
           asd.push(sameElements);
         }
       });
@@ -66,8 +59,8 @@
       return ((userFilter['housing-features'] === 'any') || (arrayCompare(userFilter['housing-features'], element.offer.features)));
     });
     var filteredPinsQuantity = (filteredArray.length > 5) ? 5 : filteredArray.length;
-    window.pinDrawing(filteredArray, filteredPinsQuantity);
-    window.popupAppear(filteredArray);
+    window.pinsCards.pinDrawing(filteredArray, filteredPinsQuantity);
+    window.pinsCards.popupAppear(filteredArray);
   };
 
   filtersForm.addEventListener('change', function (evt) {

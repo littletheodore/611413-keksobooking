@@ -1,29 +1,31 @@
 'use strict';
 (function () {
-
+  window.ESC_KEYCODE = 27;
   var PIN = {
     width: 50,
     height: 70
   };
-
-  window.PIN = PIN;
-
   var mapPins = document.querySelector('.map__pins');
   var pinTemplate = document.querySelector('#pin').content.querySelector('button');
   var fragment = document.createDocumentFragment();
   var pinDrawing = function (array, PIN_QUANTITY) {
+    var pins = document.querySelectorAll('button.map__pin');
+    if (pins) {
+      pins.forEach(function (element, index) {
+        if (index !== window.map.MAIN_ICON_INDEX) {
+          mapPins.removeChild(element);
+        }
+      });
+    }
     for (var i = 0; i < PIN_QUANTITY; i++) {
       var element = pinTemplate.cloneNode(true);
-      element.style = 'left:' + (array[i].location.x - window.PIN.width / 2) + 'px; ' + 'top:' + (array[i].location.y - window.PIN.height) + 'px;';
+      element.style = 'left:' + (array[i].location.x - window.pinsCards.PIN.width / 2) + 'px; ' + 'top:' + (array[i].location.y - window.pinsCards.PIN.height) + 'px;';
       element.children[0].src = array[i].author.avatar;
       element.children[0].alt = array[i].offer.title;
       fragment.appendChild(element);
       mapPins.appendChild(fragment);
-      window.mapPins = mapPins;
     }
   };
-  window.pinDrawing = pinDrawing;
-
   var FEATURES_VARIANTS = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
   var TYPE_VARIANTS = {
     'palace': 'Дворец',
@@ -31,11 +33,10 @@
     'house': 'Дом',
     'bungalo': 'Бунгало'
   };
-
   var fillMainCard = function (array, pinNumber) {
     var oldPopup = document.querySelector('article.popup');
     if (oldPopup) {
-      window.map.removeChild(oldPopup);
+      window.map.map.removeChild(oldPopup);
     }
     var cardTemplate = document.querySelector('#card').content.querySelector('article');
     var mainCard = cardTemplate.cloneNode(true);
@@ -52,29 +53,33 @@
       newFeaturesArray[i] = featuresList.children[0];
       featuresList.removeChild(featuresList.children[0]);
     }
-    for (var i = 0; i < (array[pinNumber].offer.features.length); i++) {
-      var feature = array[pinNumber].offer.features[i];
-      newFeaturesArray.forEach(function (element) {
-        var icon = element.classList;
+
+    array[pinNumber].offer.features.forEach(function (element) {
+      var feature = element;
+      newFeaturesArray.forEach(function (param) {
+        var icon = param.classList;
         if (icon[1] === 'popup__feature--' + feature) {
-          featuresList.appendChild(element);
+          featuresList.appendChild(param);
         }
       });
-    }
+    });
+
     mainCard.children[9].textContent = array[pinNumber].offer.description;
 
-    if (array[pinNumber].offer.photos.length != 0) {
+    if (array[pinNumber].offer.photos.length !== 0) {
       var popupPhotos = mainCard.children[10];
       popupPhotos.children[0].src = array[pinNumber].offer.photos[0];
-      for (var i = 1; i < (array[pinNumber].offer.photos.length); i++) {
-        var newPhoto = popupPhotos.children[0].cloneNode(true);
-        newPhoto.src = array[pinNumber].offer.photos[i];
-        popupPhotos.appendChild(newPhoto);
-      }
+      array[pinNumber].offer.photos.forEach(function (element, index) {
+        if (index > 0) {
+          var newPhoto = popupPhotos.children[0].cloneNode(true);
+          newPhoto.src = element;
+          popupPhotos.appendChild(newPhoto);
+        }
+      });
     } else {
       mainCard.removeChild(mainCard.children[10]);
     }
-    window.map.insertBefore(mainCard, window.map.children[1]);
+    window.map.map.insertBefore(mainCard, window.map.map.children[1]);
     window.mainCard = mainCard;
   };
 
@@ -94,7 +99,6 @@
     };
     mapPins.addEventListener('click', onPinClickOpenPopup);
 
-    window.ESC_KEYCODE = 27;
     var closePopup = function () {
       var onPopupCloseClick = document.querySelector('.popup__close');
       var onClickClosePopup = function () {
@@ -113,5 +117,10 @@
     };
 
   };
-  window.popupAppear = popupAppear;
+
+  window.pinsCards = {
+    'PIN': PIN,
+    'pinDrawing': pinDrawing,
+    'popupAppear': popupAppear
+  };
 })();

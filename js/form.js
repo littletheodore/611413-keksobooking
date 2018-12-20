@@ -64,7 +64,7 @@
     Array.prototype.forEach.call(adCapacity.children, function (element) {
       element.removeAttribute('selected', 'selected');
       element.setAttribute('disabled', 'disabled');
-      if (element.value == checkedRoomIndex || element.value < checkedRoomIndex && element.value > 0) {
+      if (+element.value === checkedRoomIndex || element.value < checkedRoomIndex && element.value > 0) {
         element.removeAttribute('disabled', 'disabled');
         element.setAttribute('selected', 'selected');
       }
@@ -88,8 +88,8 @@
   resetButton.addEventListener('click', function (evt) {
     evt.preventDefault();
     adForm.reset();
-    window.mapActiveModeOff();
-    window.fillAdress(window.MAIN_PIN_START_COORDS.X, window.MAIN_PIN_START_COORDS.Y);
+    window.map.activeModeOff();
+    window.mainPin.fillAdress(window.map.MAIN_PIN_START_COORDS.X, window.map.MAIN_PIN_START_COORDS.Y);
     selectReset(adCheckOut);
     adPrice.removeAttribute('style', 'outline: 5px solid red');
     adTitle.removeAttribute('style', 'outline: 5px solid red');

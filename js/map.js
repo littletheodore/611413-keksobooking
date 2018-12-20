@@ -3,19 +3,15 @@
   var noticeFieldsets = document.querySelectorAll('.ad-form>fieldset');
   var mapFiltersForm = document.querySelector('.map__filters');
   var noticeForm = document.querySelector('.ad-form');
-  var mainPin = document.querySelector('.map__pin--main');
-  window.mainPin = mainPin;
   var MAIN_ICON_INDEX = 0;
-  var map = document.querySelector('.map');
-  window.map = map;
   var PIN_QUANTITY = 5;
+  var map = document.querySelector('.map');
+  var mainPin = document.querySelector('.map__pin--main');
   var MAIN_PIN_START_COORDS = {
-    X: parseFloat(window.mainPin.style.left),
-    Y: parseFloat(window.mainPin.style.top)
+    X: parseFloat(mainPin.style.left),
+    Y: parseFloat(mainPin.style.top)
   };
-  window.MAIN_PIN_START_COORDS = MAIN_PIN_START_COORDS;
-
-  var mapActiveModeOff = function () {
+  var activeModeOff = function () {
     noticeFieldsets.forEach(function (element) {
       element.disabled = 'disabled';
     });
@@ -32,26 +28,32 @@
     }
     var pins = document.querySelectorAll('button.map__pin');
     pins.forEach(function (element, index) {
-      if (index !== MAIN_ICON_INDEX) {
+      if (index !== window.map.MAIN_ICON_INDEX) {
         window.mapPins.removeChild(element);
       }
     });
-    window.mainPin.style.top = window.MAIN_PIN_START_COORDS.Y + 'px';
-    window.mainPin.style.left = window.MAIN_PIN_START_COORDS.X + 'px';
+    window.map.mainPin.style.top = window.map.MAIN_PIN_START_COORDS.Y + 'px';
+    window.map.mainPin.style.left = window.map.MAIN_PIN_START_COORDS.X + 'px';
   };
 
-  window.mapActiveModeOff = mapActiveModeOff;
-  window.mapActiveModeOff();
-
-  var mapActiveModeOn = function () {
+  var activeModeOn = function () {
     map.classList.remove('map--faded');
     mapFiltersForm.classList.remove('map__filters--disabled');
-    window.pinDrawing(window.load.hosts, PIN_QUANTITY);
-    window.popupAppear(window.load.hosts);
+    window.pinsCards.pinDrawing(window.load.hosts, PIN_QUANTITY);
+    window.pinsCards.popupAppear(window.load.hosts);
     noticeForm.classList.remove('ad-form--disabled');
     noticeFieldsets.forEach(function (element) {
       element.disabled = '';
     });
   };
-  window.mapActiveModeOn = mapActiveModeOn;
+
+  window.map = {
+    'map': map,
+    'mainPin': mainPin,
+    'MAIN_PIN_START_COORDS': MAIN_PIN_START_COORDS,
+    'MAIN_ICON_INDEX': MAIN_ICON_INDEX,
+    'activeModeOn': activeModeOn,
+    'activeModeOff': activeModeOff
+  };
+  window.map.activeModeOff();
 })();
