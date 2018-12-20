@@ -1,7 +1,5 @@
-//main_pin.js
 'use strict';
 (function () {
-  //Заполнение поля адрес
   var MAIN_ICON_SIZE = 65;
   var halfMainIconSize = MAIN_ICON_SIZE / 2;
   var fillAdress = function (iconX, iconY) {
@@ -11,7 +9,6 @@
   };
   window.fillAdress = fillAdress;
 
-  //Переход в активное состояние по перетаскиванию основной иконки
   var MAP_FIELD = {
     width: {
       min: 50,
@@ -42,12 +39,12 @@
       var newCoords = {
         X: window.mainPin.offsetLeft - shift.x,
         Y: window.mainPin.offsetTop - shift.y
-      }
+      };
       ifIncorrectCoords(newCoords);
       window.mainPin.style.top = newCoords.Y + 'px';
       window.mainPin.style.left = newCoords.X + 'px';
       window.fillAdress(startCoordinates.x + (window.PIN.width / 2), startCoordinates.y + window.PIN.height);
-    }
+    };
 
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
@@ -63,7 +60,7 @@
       var newCoords = {
         X: window.mainPin.offsetLeft - shift.x,
         Y: window.mainPin.offsetTop - shift.y
-      }
+      };
       ifIncorrectCoords(newCoords);
       window.mainPin.style.top = newCoords.Y + 'px';
       window.mainPin.style.left = newCoords.X + 'px';
@@ -71,7 +68,6 @@
       window.mapActiveModeOn();
       window.mainPin.removeEventListener('mousemove', onMouseMove);
       window.mainPin.removeEventListener('mouseup', onMouseUp);
-      window.mainPin.removeEventListener('mousedown', onMouseDown);
     };
     var ifIncorrectCoords = function (newCoords) {
       if ((newCoords.X > MAP_FIELD.width.max) || (newCoords.X < MAP_FIELD.width.min)) {

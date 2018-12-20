@@ -1,12 +1,13 @@
-//pins_cards.js
 'use strict';
 (function () {
-  //Отрисовка меток на карте
+
   var PIN = {
     width: 50,
     height: 70
   };
+
   window.PIN = PIN;
+
   var mapPins = document.querySelector('.map__pins');
   var pinTemplate = document.querySelector('#pin').content.querySelector('button');
   var fragment = document.createDocumentFragment();
@@ -23,7 +24,6 @@
   };
   window.pinDrawing = pinDrawing;
 
-  //Заполнение карточки выбранной метки
   var FEATURES_VARIANTS = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
   var TYPE_VARIANTS = {
     'palace': 'Дворец',
@@ -31,10 +31,11 @@
     'house': 'Дом',
     'bungalo': 'Бунгало'
   };
+
   var fillMainCard = function (array, pinNumber) {
     var oldPopup = document.querySelector('article.popup');
     if (oldPopup) {
-      map.removeChild(oldPopup);
+      window.map.removeChild(oldPopup);
     }
     var cardTemplate = document.querySelector('#card').content.querySelector('article');
     var mainCard = cardTemplate.cloneNode(true);
@@ -61,22 +62,26 @@
       });
     }
     mainCard.children[9].textContent = array[pinNumber].offer.description;
-    var popupPhotos = mainCard.children[10];
-    popupPhotos.children[0].src = array[pinNumber].offer.photos[0];
-    for (var i = 1; i < (array[pinNumber].offer.photos.length); i++) {
-      var newPhoto = popupPhotos.children[0].cloneNode(true);
-      newPhoto.src = array[pinNumber].offer.photos[i];
-      popupPhotos.appendChild(newPhoto);
+
+    if (array[pinNumber].offer.photos.length != 0) {
+      var popupPhotos = mainCard.children[10];
+      popupPhotos.children[0].src = array[pinNumber].offer.photos[0];
+      for (var i = 1; i < (array[pinNumber].offer.photos.length); i++) {
+        var newPhoto = popupPhotos.children[0].cloneNode(true);
+        newPhoto.src = array[pinNumber].offer.photos[i];
+        popupPhotos.appendChild(newPhoto);
+      }
+    } else {
+      mainCard.removeChild(mainCard.children[10]);
     }
-    window.map.insertBefore(mainCard, map.children[1]);
+    window.map.insertBefore(mainCard, window.map.children[1]);
     window.mainCard = mainCard;
   };
 
-  //Заполнение карточки выбранной метки по клику
   var popupAppear = function (array) {
     var DISABLE_ELEMENTS_QUANTITY = 2;
     var onPinClickOpenPopup = function (evt) {
-      var target = event.target;
+      var target = evt.target;
       if (!(target.type === 'button')) {
         target = target.parentElement;
       }
@@ -88,11 +93,11 @@
       });
     };
     mapPins.addEventListener('click', onPinClickOpenPopup);
-    //Закрытие popup по клику и по ESC
+
     window.ESC_KEYCODE = 27;
     var closePopup = function () {
       var onPopupCloseClick = document.querySelector('.popup__close');
-      var onClickClosePopup = function (evt) {
+      var onClickClosePopup = function () {
         window.mainCard.classList.add('hidden');
         document.removeEventListener('keydown', onEscClosePopup);
       };
@@ -109,6 +114,4 @@
 
   };
   window.popupAppear = popupAppear;
-
-
 })();

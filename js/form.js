@@ -1,11 +1,8 @@
-//form.js
 'use strict';
 (function () {
-  //Валидация формы
-  //Заголовок объявления
   var adTitle = document.querySelector('#title');
   adTitle.setAttribute('required', 'required');
-  adTitle.setAttribute('minlength', '30');
+  adTitle.setAttribute('minlength', '3');
   adTitle.setAttribute('maxlength', '100');
   adTitle.addEventListener('input', function () {
     if ((adTitle.value.length > adTitle.maxLength) || (adTitle.value.length < adTitle.minLength)) {
@@ -15,7 +12,6 @@
     }
   });
 
-  //Цена за ночь
   var TYPE_MIN_PRICE = {
     'palace': 10000,
     'flat': 1000,
@@ -46,7 +42,6 @@
     }
   });
 
-  //Время заезда/выезда
   var adCheckIn = document.querySelector('#timein');
   var adCheckOut = document.querySelector('#timeout');
   adCheckIn.addEventListener('change', function (evt) {
@@ -61,7 +56,6 @@
     });
   });
 
-  //Количество комнат/количество мест
   var adRoomNumber = document.querySelector('#room_number');
   var adCapacity = document.querySelector('#capacity');
   var checkedRoomNumber = document.querySelector('#room_number>option:checked').value;
@@ -75,16 +69,15 @@
         element.setAttribute('selected', 'selected');
       }
     });
-  }
+  };
 
   setAvailibleCapacity();
 
   adRoomNumber.addEventListener('change', function (evt) {
-    checkedRoomNumber = parseInt(evt.target.value);
+    checkedRoomNumber = parseInt(evt.target.value, 10);
     setAvailibleCapacity();
   });
 
-  //Очистка формы по нажатию на reset
   var selectReset = function (nodeList) {
     Array.prototype.forEach.call(nodeList.children, function (element) {
       element.removeAttribute('selected', 'selected');
@@ -97,10 +90,8 @@
     adForm.reset();
     window.mapActiveModeOff();
     window.fillAdress(window.MAIN_PIN_START_COORDS.X, window.MAIN_PIN_START_COORDS.Y);
-    var adCheckOut = document.querySelector('#timeout');
     selectReset(adCheckOut);
     adPrice.removeAttribute('style', 'outline: 5px solid red');
     adTitle.removeAttribute('style', 'outline: 5px solid red');
   });
-
 })();

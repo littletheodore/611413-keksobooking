@@ -1,8 +1,5 @@
 'use strict';
-
-//map.js
 (function () {
-  //Активное-неактивное состояние форм
   var noticeFieldsets = document.querySelectorAll('.ad-form>fieldset');
   var mapFiltersForm = document.querySelector('.map__filters');
   var noticeForm = document.querySelector('.ad-form');
@@ -17,7 +14,7 @@
     Y: parseFloat(window.mainPin.style.top)
   };
   window.MAIN_PIN_START_COORDS = MAIN_PIN_START_COORDS;
-  //Переход в неактивное состояние форм
+
   var mapActiveModeOff = function () {
     noticeFieldsets.forEach(function (element) {
       element.disabled = 'disabled';
@@ -36,7 +33,7 @@
     var pins = document.querySelectorAll('button.map__pin');
     pins.forEach(function (element, index) {
       if (index !== MAIN_ICON_INDEX) {
-        mapPins.removeChild(element);
+        window.mapPins.removeChild(element);
       }
     });
     window.mainPin.style.top = window.MAIN_PIN_START_COORDS.Y + 'px';
