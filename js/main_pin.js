@@ -1,7 +1,5 @@
-//main_pin.js
 'use strict';
 (function () {
-  //Заполнение поля адрес
   var MAIN_ICON_SIZE = 65;
   var halfMainIconSize = MAIN_ICON_SIZE / 2;
   var fillAdress = function (iconX, iconY) {
@@ -9,9 +7,6 @@
     adressInput.setAttribute('value', Math.round(iconX + halfMainIconSize) + ',' + Math.round(iconY + halfMainIconSize));
     adressInput.setAttribute('readonly', 'readonly');
   };
-  window.fillAdress = fillAdress;
-
-  //Переход в активное состояние по перетаскиванию основной иконки
   var MAP_FIELD = {
     width: {
       min: 50,
@@ -40,14 +35,14 @@
         y: moveEvt.clientY
       };
       var newCoords = {
-        X: window.mainPin.offsetLeft - shift.x,
-        Y: window.mainPin.offsetTop - shift.y
-      }
+        X: window.map.mainPin.offsetLeft - shift.x,
+        Y: window.map.mainPin.offsetTop - shift.y
+      };
       ifIncorrectCoords(newCoords);
-      window.mainPin.style.top = newCoords.Y + 'px';
-      window.mainPin.style.left = newCoords.X + 'px';
-      window.fillAdress(startCoordinates.x + (window.PIN.width / 2), startCoordinates.y + window.PIN.height);
-    }
+      window.map.mainPin.style.top = newCoords.Y + 'px';
+      window.map.mainPin.style.left = newCoords.X + 'px';
+      window.mainPin.fillAdress(startCoordinates.x + (window.pinsCards.PIN.width / 2), startCoordinates.y + window.pinsCards.PIN.height);
+    };
 
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
@@ -61,17 +56,16 @@
         y: upEvt.clientY
       };
       var newCoords = {
-        X: window.mainPin.offsetLeft - shift.x,
-        Y: window.mainPin.offsetTop - shift.y
-      }
+        X: window.map.mainPin.offsetLeft - shift.x,
+        Y: window.map.mainPin.offsetTop - shift.y
+      };
       ifIncorrectCoords(newCoords);
-      window.mainPin.style.top = newCoords.Y + 'px';
-      window.mainPin.style.left = newCoords.X + 'px';
-      window.fillAdress(startCoordinates.x + (window.PIN.width / 2), startCoordinates.y + window.PIN.height);
-      window.mapActiveModeOn();
-      window.mainPin.removeEventListener('mousemove', onMouseMove);
-      window.mainPin.removeEventListener('mouseup', onMouseUp);
-      window.mainPin.removeEventListener('mousedown', onMouseDown);
+      window.map.mainPin.style.top = newCoords.Y + 'px';
+      window.map.mainPin.style.left = newCoords.X + 'px';
+      window.mainPin.fillAdress(startCoordinates.x + (window.pinsCards.PIN.width / 2), startCoordinates.y + window.pinsCards.PIN.height);
+      window.map.activeModeOn();
+      window.map.mainPin.removeEventListener('mousemove', onMouseMove);
+      window.map.mainPin.removeEventListener('mouseup', onMouseUp);
     };
     var ifIncorrectCoords = function (newCoords) {
       if ((newCoords.X > MAP_FIELD.width.max) || (newCoords.X < MAP_FIELD.width.min)) {
@@ -82,10 +76,12 @@
       }
       return newCoords;
     };
-    window.mainPin.addEventListener('mousemove', onMouseMove);
-    window.mainPin.addEventListener('mouseup', onMouseUp);
+    window.map.mainPin.addEventListener('mousemove', onMouseMove);
+    window.map.mainPin.addEventListener('mouseup', onMouseUp);
   };
 
-  window.mainPin.addEventListener('mousedown', onMouseDown);
-
+  window.map.mainPin.addEventListener('mousedown', onMouseDown);
+  window.mainPin = {
+    'fillAdress': fillAdress,
+  };
 })();

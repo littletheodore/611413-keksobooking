@@ -1,7 +1,6 @@
 'use strict';
 
 (function () {
-  //Загрузка данных об объектах
   var hosts = [];
   var GETDATAURL = 'https://js.dump.academy/keksobooking/data';
   window.load = function (onSuccess, onError) {
@@ -9,9 +8,22 @@
     xhr.responseType = 'json';
     xhr.open('GET', GETDATAURL);
     xhr.addEventListener('load', function () {
-      onSuccess(xhr.response);
+      if (xhr.status === 200) {
+        onSuccess(xhr.response);
+      } else {
+        onError('Статус ответа' + xhr.status);
+      }
     });
     xhr.send();
+    xhr.addEventListener('error', function () {
+      onError('Произошла ошибка ' + xhr.status);
+    });
+    var TIMEOUT = 10000;
+    xhr.addEventListener('timeout', function () {
+      if (xhr.timeout > TIMEOUT) {
+        onError('Сервер не отвечает в течение' + xhr.timeout + 'секунд');
+      }
+    });
   };
 
   window.load(function (newHosts) {
