@@ -1,72 +1,88 @@
 'use strict';
 (function () {
-  var adTitle = document.querySelector('#title');
-  adTitle.setAttribute('required', 'required');
-  adTitle.setAttribute('minlength', '3');
-  adTitle.setAttribute('maxlength', '100');
-  adTitle.addEventListener('input', function () {
-    if ((adTitle.value.length > adTitle.maxLength) || (adTitle.value.length < adTitle.minLength)) {
-      adTitle.setAttribute('style', 'outline: 5px solid red');
-    } else {
-      adTitle.removeAttribute('style', 'outline: 5px solid red');
-    }
-  });
-
   var TYPE_MIN_PRICE = {
     'palace': 10000,
     'flat': 1000,
     'house': 5000,
     'bungalo': 0
   };
-  var adForm = document.querySelector('.ad-form');
-  var adPrice = document.querySelector('#price');
-  var adType = document.querySelector('#type');
-  var checkedType = document.querySelector('#type>option:checked');
-  adPrice.setAttribute('required', 'required');
-  adPrice.setAttribute('type', 'number');
-  adPrice.setAttribute('max', '1000000');
-  adPrice.setAttribute('min', TYPE_MIN_PRICE[checkedType.value]);
-  adPrice.setAttribute('placeholder', TYPE_MIN_PRICE[checkedType.value]);
+  var adTitle = window.map.adForm.querySelector('#title');
+  var adPrice = window.map.adForm.querySelector('#price');
+  var adType = window.map.adForm.querySelector('#type');
+  var checkedType = window.map.adForm.querySelector('#type>option:checked');
+  var adCheckIn = window.map.adForm.querySelector('#timein');
+  var adCheckOut = window.map.adForm.querySelector('#timeout');
+  var adRoomNumber = window.map.adForm.querySelector('#room_number');
+  var adCapacity = window.map.adForm.querySelector('#capacity');
+  var checkedRoomNumber = window.map.adForm.querySelector('#room_number>option:checked').value;
+
+  var selectReset = function (nodeList) {
+    Array.prototype.forEach.call(nodeList.children, function (element) {
+      element.selected = '';
+      element.disabled = '';
+    });
+  };
+
+  adTitle.required = 'required';
+  adTitle.minLength = '30';
+  adTitle.maxLength = '100';
+  adTitle.addEventListener('input', function () {
+    if ((adTitle.value.length > adTitle.maxLength) || (adTitle.value.length < adTitle.minLength)) {
+      adTitle.style = 'outline: 5px solid red';
+    } else {
+      adTitle.style = '';
+    }
+  });
+
+  adPrice.required ='required';
+  adPrice.type = 'number';
+  adPrice.max = 1000000;
+  adPrice.min = TYPE_MIN_PRICE[checkedType.value];
+  adPrice.placeholder = TYPE_MIN_PRICE[checkedType.value];
   adType.addEventListener('change', function (evt) {
     checkedType = evt.target.value;
-    adPrice.setAttribute('min', TYPE_MIN_PRICE[checkedType]);
-    adPrice.setAttribute('placeholder', TYPE_MIN_PRICE[checkedType]);
+    adPrice.min = TYPE_MIN_PRICE[checkedType];
+    adPrice.placeholder = TYPE_MIN_PRICE[checkedType];
   });
 
   adPrice.addEventListener('input', function () {
     var inputValue = parseFloat(adPrice.value);
     if ((inputValue < adPrice.min) || (inputValue > adPrice.max)) {
-      adPrice.setAttribute('style', 'outline: 5px solid red');
+      adPrice.style = 'outline: 5px solid red';
     } else {
-      adPrice.removeAttribute('style', 'outline: 5px solid red');
+      adPrice.style = '';
     }
   });
 
-  var adCheckIn = document.querySelector('#timein');
-  var adCheckOut = document.querySelector('#timeout');
-  adCheckIn.addEventListener('change', function (evt) {
-    selectReset(adCheckOut);
+  var checkInOutTimeSet = function (input, evt) {
+    selectReset(input);
     var checkedTime = parseFloat(evt.target.value);
-    Array.prototype.forEach.call(adCheckOut.children, function (element) {
+    Array.prototype.forEach.call(input.children, function (element) {
       if (parseFloat(element.value) === checkedTime) {
-        element.setAttribute('selected', 'selected');
+        element.selected = 'selected';
       } else {
-        element.setAttribute('disabled', 'disabled');
+        element.selected = '';
       }
     });
+  };
+
+  adCheckIn.addEventListener('change', function (evt) {
+    checkInOutTimeSet(adCheckOut, evt);
   });
 
-  var adRoomNumber = document.querySelector('#room_number');
-  var adCapacity = document.querySelector('#capacity');
-  var checkedRoomNumber = document.querySelector('#room_number>option:checked').value;
+  adCheckOut.addEventListener('change', function (evt) {
+    checkInOutTimeSet(adCheckIn, evt);
+  });
+
+
   var setAvailibleCapacity = function () {
     var checkedRoomIndex = checkedRoomNumber % 10;
     Array.prototype.forEach.call(adCapacity.children, function (element) {
-      element.removeAttribute('selected', 'selected');
-      element.setAttribute('disabled', 'disabled');
+      element.selected = '';
+      element.disabled = 'disabled';
       if (+element.value === checkedRoomIndex || element.value < checkedRoomIndex && element.value > 0) {
-        element.removeAttribute('disabled', 'disabled');
-        element.setAttribute('selected', 'selected');
+        element.disabled = '';
+        element.selected = 'selected';
       }
     });
   };
@@ -78,20 +94,16 @@
     setAvailibleCapacity();
   });
 
-  var selectReset = function (nodeList) {
-    Array.prototype.forEach.call(nodeList.children, function (element) {
-      element.removeAttribute('selected', 'selected');
-      element.removeAttribute('disabled', 'disabled');
-    });
-  };
+
   var resetButton = document.querySelector('button[type=reset]');
   resetButton.addEventListener('click', function (evt) {
     evt.preventDefault();
-    adForm.reset();
-    window.map.activeModeOff();
-    window.mainPin.fillAdress(window.map.MAIN_PIN_START_COORDS.X, window.map.MAIN_PIN_START_COORDS.Y);
+    window.map.adForm.reset();
     selectReset(adCheckOut);
-    adPrice.removeAttribute('style', 'outline: 5px solid red');
-    adTitle.removeAttribute('style', 'outline: 5px solid red');
+    adPrice.style = '';
+    adTitle.style = '';
+    window.map.activeModeOff();
+    window.map.fillAdress(window.map.MAIN_PIN_START_COORDS.X, window.map.MAIN_PIN_START_COORDS.Y);
+
   });
 })();

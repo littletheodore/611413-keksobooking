@@ -1,35 +1,34 @@
 'use strict';
 
 (function () {
-  var hosts = [];
-  var GETDATAURL = 'https://js.dump.academy/keksobooking/data';
+  var GETDATAURL = 'https:js.dump.academy/keksobooking/data';
+  var StatusCode = {
+    'Success' : 200,
+    'Response redirection' : 300,
+    'Response error' : 400,
+    'Server error' : 500
+  }
   window.load = function (onSuccess, onError) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
-    xhr.open('GET', GETDATAURL);
     xhr.addEventListener('load', function () {
-      if (xhr.status === 200) {
+      if (xhr.status === StatusCode.Success) {
         onSuccess(xhr.response);
       } else {
         onError('Статус ответа' + xhr.status);
       }
     });
-    xhr.send();
     xhr.addEventListener('error', function () {
-      onError('Произошла ошибка ' + xhr.status);
+      onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
     });
+
     var TIMEOUT = 10000;
     xhr.addEventListener('timeout', function () {
       if (xhr.timeout > TIMEOUT) {
-        onError('Сервер не отвечает в течение' + xhr.timeout + 'секунд');
+        onError('Сервер не отвечает в течение' + xhr.timeout + 'мс');
       }
     });
+    xhr.open('GET', GETDATAURL);
+    xhr.send();
   };
-
-  window.load(function (newHosts) {
-    for (var i = 0; i < newHosts.length; i++) {
-      hosts[i] = newHosts[i];
-    }
-    window.load.hosts = hosts;
-  });
 })();

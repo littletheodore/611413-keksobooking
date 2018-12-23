@@ -1,55 +1,33 @@
 'use strict';
 (function () {
   window.ESC_KEYCODE = 27;
-  var PIN = {
-    width: 50,
-    height: 70
-  };
-  var mapPins = document.querySelector('.map__pins');
-  var pinTemplate = document.querySelector('#pin').content.querySelector('button');
-  var fragment = document.createDocumentFragment();
-  var pinDrawing = function (array, PIN_QUANTITY) {
-    var pins = document.querySelectorAll('button.map__pin');
-    if (pins) {
-      pins.forEach(function (element, index) {
-        if (index !== window.map.MAIN_ICON_INDEX) {
-          mapPins.removeChild(element);
-        }
-      });
-    }
-    for (var i = 0; i < PIN_QUANTITY; i++) {
-      var element = pinTemplate.cloneNode(true);
-      element.style = 'left:' + (array[i].location.x - window.pinsCards.PIN.width / 2) + 'px; ' + 'top:' + (array[i].location.y - window.pinsCards.PIN.height) + 'px;';
-      element.children[0].src = array[i].author.avatar;
-      element.children[0].alt = array[i].offer.title;
-      fragment.appendChild(element);
-      mapPins.appendChild(fragment);
-    }
-  };
-  var FEATURES_VARIANTS = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
-  var TYPE_VARIANTS = {
+
+  var FeatureVariant = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
+  var TypeVariant = {
     'palace': 'Дворец',
     'flat': 'Квартира',
     'house': 'Дом',
     'bungalo': 'Бунгало'
   };
+
+
   var fillMainCard = function (array, pinNumber) {
     var oldPopup = document.querySelector('article.popup');
     if (oldPopup) {
-      window.map.map.removeChild(oldPopup);
+      window.map.section.removeChild(oldPopup);
     }
     var cardTemplate = document.querySelector('#card').content.querySelector('article');
     var mainCard = cardTemplate.cloneNode(true);
     mainCard.children[0].src = array[pinNumber].author.avatar;
     mainCard.children[2].textContent = array[pinNumber].offer.title;
     mainCard.children[3].textContent = array[pinNumber].offer.adress;
-    mainCard.children[4].innerHTML = array[pinNumber].offer.price + '&#x20bd;<span>/ночь</span>';
-    mainCard.children[5].textContent = TYPE_VARIANTS[array[pinNumber].offer.type];
+    mainCard.children[4].textContent = array[pinNumber].offer.price + ' руб/ночь';
+    mainCard.children[5].textContent = TypeVariant[array[pinNumber].offer.type];
     mainCard.children[6].textContent = array[pinNumber].offer.rooms + ' комнаты для ' + array[pinNumber].offer.guests + ' гостей';
     mainCard.children[7].textContent = 'Заезд после ' + array[pinNumber].offer.checkin + ', выезд до ' + array[pinNumber].offer.checkout;
     var featuresList = mainCard.children[8];
     var newFeaturesArray = [];
-    for (var i = 0; i < FEATURES_VARIANTS.length; i++) {
+    for (var i = 0; i < FeatureVariant.length; i++) {
       newFeaturesArray[i] = featuresList.children[0];
       featuresList.removeChild(featuresList.children[0]);
     }
@@ -79,7 +57,7 @@
     } else {
       mainCard.removeChild(mainCard.children[10]);
     }
-    window.map.map.insertBefore(mainCard, window.map.map.children[1]);
+    window.map.section.insertBefore(mainCard, window.map.section.children[1]);
     window.mainCard = mainCard;
   };
 
@@ -90,14 +68,17 @@
       if (!(target.type === 'button')) {
         target = target.parentElement;
       }
-      Array.prototype.forEach.call(mapPins.children, function (element, index) {
+      target.classList.add('map__pin--active');
+      Array.prototype.forEach.call(window.pins.mapPins.children, function (element, index) {
         if ((element === target) && (index > 1)) {
           fillMainCard(array, index - DISABLE_ELEMENTS_QUANTITY);
           closePopup();
+        } else {
+          element.classList.remove('map__pin--active');
         }
       });
     };
-    mapPins.addEventListener('click', onPinClickOpenPopup);
+    window.pins.mapPins.addEventListener('click', onPinClickOpenPopup);
 
     var closePopup = function () {
       var onPopupCloseClick = document.querySelector('.popup__close');
@@ -111,16 +92,14 @@
           document.removeEventListener('keydown', onEscClosePopup);
         }
       };
-      onPopupCloseClick.setAttribute('tabindex', '0');
+      onPopupCloseClick.tabindex = 0;
       onPopupCloseClick.addEventListener('click', onClickClosePopup);
       document.addEventListener('keydown', onEscClosePopup);
     };
 
   };
 
-  window.pinsCards = {
-    'PIN': PIN,
-    'pinDrawing': pinDrawing,
+  window.cards = {
     'popupAppear': popupAppear
   };
 })();
