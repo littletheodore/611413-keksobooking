@@ -9,11 +9,15 @@
   var adTitle = window.map.adForm.querySelector('#title');
   var adPrice = window.map.adForm.querySelector('#price');
   var adType = window.map.adForm.querySelector('#type');
+  var adAvatar = window.map.adForm.querySelector('#avatar');
+  var adAvatarPic = window.map.adForm.querySelector('.ad-form-header__preview > img');
   var checkedType = window.map.adForm.querySelector('#type>option:checked');
   var adCheckIn = window.map.adForm.querySelector('#timein');
   var adCheckOut = window.map.adForm.querySelector('#timeout');
   var adRoomNumber = window.map.adForm.querySelector('#room_number');
   var adCapacity = window.map.adForm.querySelector('#capacity');
+  var adPhoto = window.map.adForm.querySelector('#images');
+  var adPhotoPic = window.map.adForm.querySelector('.ad-form__photo');
   var checkedRoomNumber = window.map.adForm.querySelector('#room_number>option:checked').value;
 
   var selectReset = function (nodeList) {
@@ -21,6 +25,27 @@
       element.selected = '';
       element.disabled = '';
     });
+  };
+
+  var previewImage = function (input, imgBox) {
+    var picContainer = imgBox.parentElement;
+    var FReader = new FileReader();
+    var newBox = imgBox.cloneNode(true);
+    FReader.readAsDataURL(input.files[0]);
+    FReader.onload = function (event) {
+      if (imgBox.tagName === 'IMG') {
+        imgBox.src = event.target.result;
+      } else {
+        var fragment = document.createDocumentFragment();
+        fragment.appendChild(newBox);
+        var newPic = document.createElement('img');
+        newBox.appendChild(newPic);
+        newPic.width = 70;
+        newPic.height = 70;
+        newPic.src = event.target.result;
+        picContainer.appendChild(fragment);
+      }
+    };
   };
 
   adTitle.required = 'required';
@@ -32,6 +57,14 @@
     } else {
       adTitle.style = '';
     }
+  });
+
+  adAvatar.addEventListener('change', function () {
+    previewImage(adAvatar, adAvatarPic);
+  });
+
+  adPhoto.addEventListener('change', function () {
+    previewImage(adPhoto, adPhotoPic);
   });
 
   adPrice.required = 'required';
