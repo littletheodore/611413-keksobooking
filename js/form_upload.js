@@ -9,7 +9,7 @@
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
     xhr.addEventListener('load', function () {
-      if (xhr.status === 200) {
+      if (xhr.status === window.StatusCode.Success) {
         onSuccess(xhr.response);
       } else {
         errorFormUpload();
@@ -53,7 +53,7 @@
 
   var successMessage = document.querySelector('#success').content.querySelector('div');
   window.map.adForm.addEventListener('submit', function (evt) {
-    window.upload(new FormData( window.map.adForm), function () {
+    window.upload(new FormData(window.map.adForm), function () {
       main.appendChild(successMessage);
       document.addEventListener('keydown', onEscCloseSuccessMessage);
       successMessage.addEventListener('click', onClickCloseSuccessMessage);

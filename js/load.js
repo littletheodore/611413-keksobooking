@@ -2,17 +2,17 @@
 
 (function () {
   var GETDATAURL = 'https:js.dump.academy/keksobooking/data';
-  var StatusCode = {
-    'Success' : 200,
-    'Response redirection' : 300,
-    'Response error' : 400,
-    'Server error' : 500
-  }
+  window.StatusCode = {
+    'Success': 200,
+    'Response redirection': 300,
+    'Response error': 400,
+    'Server error': 500
+  };
   window.load = function (onSuccess, onError) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
     xhr.addEventListener('load', function () {
-      if (xhr.status === StatusCode.Success) {
+      if (xhr.status === window.StatusCode.Success) {
         onSuccess(xhr.response);
       } else {
         onError('Статус ответа' + xhr.status);

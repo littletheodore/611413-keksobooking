@@ -59,7 +59,7 @@
       hosts.forEach(function (element, index) {
         window.load.hosts[index] = element;
       });
-      window.pins.Drawing(window.load.hosts, window.map.PIN_QUANTITY);
+      window.pins.drawing(window.load.hosts, window.map.PIN_QUANTITY);
       window.cards.popupAppear(window.load.hosts);
     });
     section.classList.remove('map--faded');
@@ -142,8 +142,8 @@
   window.map = {
     'section': section,
     'mainPin': mainPin,
-    'filtersForm' : filtersForm,
-    'adForm' : adForm,
+    'filtersForm': filtersForm,
+    'adForm': adForm,
     'MAIN_PIN_START_COORDS': MAIN_PIN_START_COORDS,
     'MAIN_ICON_INDEX': MAIN_ICON_INDEX,
     'PIN_QUANTITY': PIN_QUANTITY,

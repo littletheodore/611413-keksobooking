@@ -2,10 +2,10 @@
 (function () {
   var DEBOUNCE_INTERVAL = 300;
   var PRICE_RANGE_POINTS = {
-    'low' : 10000,
-    'middle': 10000-50000,
-    'high' : 50000
-  }
+    'low': 10000,
+    'middle': 10000 - 50000,
+    'high': 50000
+  };
   var userFilter = {
     'housing-type': 'any',
     'housing-price': 'any',
@@ -65,7 +65,7 @@
       return ((userFilter['housing-features'] === 'any') || (arrayCompare(userFilter['housing-features'], element.offer.features)));
     });
     var filteredPinsQuantity = (filteredArray.length > window.map.PIN_QUANTITY) ? window.map.PIN_QUANTITY : filteredArray.length;
-    window.pins.Drawing(filteredArray, filteredPinsQuantity);
+    window.pins.drawing(filteredArray, filteredPinsQuantity);
     window.cards.popupAppear(filteredArray);
   };
 

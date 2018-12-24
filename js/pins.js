@@ -9,7 +9,7 @@
   var pinTemplate = document.querySelector('#pin').content.querySelector('button');
   var fragment = document.createDocumentFragment();
 
-  var Drawing = function (array, pinQuantity) {
+  var drawing = function (array, pinQuantity) {
     var pins = document.querySelectorAll('button.map__pin');
     if (pins) {
       pins.forEach(function (element, index) {
@@ -28,8 +28,8 @@
     }
   };
   window.pins = {
-    'mapPins' : mapPins,
+    'mapPins': mapPins,
     'Icon': Icon,
-    'Drawing': Drawing,
+    'drawing': drawing,
   };
 })();

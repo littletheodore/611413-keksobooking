@@ -34,7 +34,7 @@
     }
   });
 
-  adPrice.required ='required';
+  adPrice.required = 'required';
   adPrice.type = 'number';
   adPrice.max = 1000000;
   adPrice.min = TYPE_MIN_PRICE[checkedType.value];
