@@ -6,6 +6,7 @@
     'house': 5000,
     'bungalo': 0
   };
+  var DropVariant = ['dragenter', 'dragover', 'dragleave'];
   var adTitle = window.map.adForm.querySelector('#title');
   var adPrice = window.map.adForm.querySelector('#price');
   var adType = window.map.adForm.querySelector('#type');
@@ -18,12 +19,39 @@
   var adCapacity = window.map.adForm.querySelector('#capacity');
   var adPhoto = window.map.adForm.querySelector('#images');
   var adPhotoPic = window.map.adForm.querySelector('.ad-form__photo');
+  var adAvatarDropZone = window.map.adForm.querySelector('.ad-form-header__drop-zone');
+  var adPhotosDropZone = window.map.adForm.querySelector('.ad-form__drop-zone');
   var checkedRoomNumber = window.map.adForm.querySelector('#room_number>option:checked').value;
+  var resetButton = window.map.adForm.querySelector('button[type=reset]');
 
   var selectReset = function (nodeList) {
     Array.prototype.forEach.call(nodeList.children, function (element) {
       element.selected = '';
       element.disabled = '';
+    });
+  };
+
+  var checkInOutTimeSet = function (input, evt) {
+    selectReset(input);
+    var checkedTime = parseFloat(evt.target.value);
+    Array.prototype.forEach.call(input.children, function (element) {
+      if (parseFloat(element.value) === checkedTime) {
+        element.selected = 'selected';
+      } else {
+        element.selected = '';
+      }
+    });
+  };
+
+  var setAvailibleCapacity = function () {
+    var checkedRoomIndex = checkedRoomNumber % 10;
+    Array.prototype.forEach.call(adCapacity.children, function (element) {
+      element.selected = '';
+      element.disabled = 'disabled';
+      if (+element.value === checkedRoomIndex || element.value < checkedRoomIndex && element.value > 0) {
+        element.disabled = '';
+        element.selected = 'selected';
+      }
     });
   };
 
@@ -43,7 +71,7 @@
         newPic.width = 70;
         newPic.height = 70;
         newPic.src = event.target.result;
-        picContainer.appendChild(fragment);
+        picContainer.insertBefore(fragment, picContainer.children[1]);
       }
     };
   };
@@ -59,19 +87,12 @@
     }
   });
 
-  adAvatar.addEventListener('change', function () {
-    previewImage(adAvatar, adAvatarPic);
-  });
-
-  adPhoto.addEventListener('change', function () {
-    previewImage(adPhoto, adPhotoPic);
-  });
-
   adPrice.required = 'required';
   adPrice.type = 'number';
   adPrice.max = 1000000;
   adPrice.min = TYPE_MIN_PRICE[checkedType.value];
   adPrice.placeholder = TYPE_MIN_PRICE[checkedType.value];
+
   adType.addEventListener('change', function (evt) {
     checkedType = evt.target.value;
     adPrice.min = TYPE_MIN_PRICE[checkedType];
@@ -87,18 +108,6 @@
     }
   });
 
-  var checkInOutTimeSet = function (input, evt) {
-    selectReset(input);
-    var checkedTime = parseFloat(evt.target.value);
-    Array.prototype.forEach.call(input.children, function (element) {
-      if (parseFloat(element.value) === checkedTime) {
-        element.selected = 'selected';
-      } else {
-        element.selected = '';
-      }
-    });
-  };
-
   adCheckIn.addEventListener('change', function (evt) {
     checkInOutTimeSet(adCheckOut, evt);
   });
@@ -107,19 +116,6 @@
     checkInOutTimeSet(adCheckIn, evt);
   });
 
-
-  var setAvailibleCapacity = function () {
-    var checkedRoomIndex = checkedRoomNumber % 10;
-    Array.prototype.forEach.call(adCapacity.children, function (element) {
-      element.selected = '';
-      element.disabled = 'disabled';
-      if (+element.value === checkedRoomIndex || element.value < checkedRoomIndex && element.value > 0) {
-        element.disabled = '';
-        element.selected = 'selected';
-      }
-    });
-  };
-
   setAvailibleCapacity();
 
   adRoomNumber.addEventListener('change', function (evt) {
@@ -127,8 +123,6 @@
     setAvailibleCapacity();
   });
 
-
-  var resetButton = document.querySelector('button[type=reset]');
   resetButton.addEventListener('click', function (evt) {
     evt.preventDefault();
     window.map.adForm.reset();
@@ -137,6 +131,38 @@
     adTitle.style = '';
     window.map.activeModeOff();
     window.map.fillAdress(window.map.MAIN_PIN_START_COORDS.X, window.map.MAIN_PIN_START_COORDS.Y);
+  });
 
+  DropVariant.forEach(function (element) {
+    adAvatarDropZone.addEventListener(element, function (evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
+    });
+    adPhotosDropZone.addEventListener(element, function (evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
+    });
+  });
+
+  adAvatarDropZone.addEventListener('drop', function (evt) {
+    evt.preventDefault();
+    evt.stopPropagation();
+    var droppedImage = evt.dataTransfer;
+    previewImage(droppedImage, adAvatarPic);
+  });
+
+  adPhotosDropZone.addEventListener('drop', function (evt) {
+    evt.preventDefault();
+    evt.stopPropagation();
+    var droppedImage = evt.dataTransfer;
+    previewImage(droppedImage, adPhotoPic);
+  });
+
+  adAvatar.addEventListener('change', function () {
+    previewImage(adAvatar, adAvatarPic);
+  });
+
+  adPhoto.addEventListener('change', function () {
+    previewImage(adPhoto, adPhotoPic);
   });
 })();
