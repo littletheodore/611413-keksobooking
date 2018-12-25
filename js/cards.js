@@ -2,7 +2,6 @@
 (function () {
   window.ESC_KEYCODE = 27;
 
-  var FeatureVariant = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
   var TypeVariant = {
     'palace': 'Дворец',
     'flat': 'Квартира',
@@ -10,53 +9,59 @@
     'bungalo': 'Бунгало'
   };
 
+  var featureSet = function (field, checkedFeatures) {
+    Array.prototype.forEach.call(field.children, function (feature) {
+      var isFeature = false;
+      checkedFeatures.forEach(function (element) {
+        if (feature.classList.contains('popup__feature--' + element)) {
+          isFeature = true;
+        }
+      });
+      if (!isFeature) {
+        feature.style = 'display:none';
+      }
+    });
+  };
 
-  var fillMainCard = function (array, pinNumber) {
+  var fillMainCard = function (checkedPin) {
     var oldPopup = document.querySelector('article.popup');
     if (oldPopup) {
       window.map.section.removeChild(oldPopup);
     }
     var cardTemplate = document.querySelector('#card').content.querySelector('article');
     var mainCard = cardTemplate.cloneNode(true);
-    mainCard.children[0].src = array[pinNumber].author.avatar;
-    mainCard.children[2].textContent = array[pinNumber].offer.title;
-    mainCard.children[3].textContent = array[pinNumber].offer.adress;
-    mainCard.children[4].textContent = array[pinNumber].offer.price + ' руб/ночь';
-    mainCard.children[5].textContent = TypeVariant[array[pinNumber].offer.type];
-    mainCard.children[6].textContent = array[pinNumber].offer.rooms + ' комнаты для ' + array[pinNumber].offer.guests + ' гостей';
-    mainCard.children[7].textContent = 'Заезд после ' + array[pinNumber].offer.checkin + ', выезд до ' + array[pinNumber].offer.checkout;
-    var featuresList = mainCard.children[8];
-    var newFeaturesArray = [];
-    for (var i = 0; i < FeatureVariant.length; i++) {
-      newFeaturesArray[i] = featuresList.children[0];
-      featuresList.removeChild(featuresList.children[0]);
-    }
-
-    array[pinNumber].offer.features.forEach(function (element) {
-      var feature = element;
-      newFeaturesArray.forEach(function (param) {
-        var icon = param.classList;
-        if (icon[1] === 'popup__feature--' + feature) {
-          featuresList.appendChild(param);
+    var cardFields = {
+      'title': checkedPin.offer.title,
+      'text--address': checkedPin.offer.adress,
+      'text--price': checkedPin.offer.price + ' руб/ночь',
+      'type': TypeVariant[checkedPin.offer.type],
+      'text--capacity': checkedPin.offer.rooms + ' комнаты для ' + checkedPin.offer.guests + ' гостей',
+      'text--time': 'Заезд после ' + checkedPin.offer.checkin + ', выезд до ' + checkedPin.offer.checkout,
+      'description': checkedPin.offer.description
+    };
+    Array.prototype.forEach.call(mainCard.children, function (field) {
+      for (var key in cardFields) {
+        if (field.classList.contains('popup__' + key)) {
+          field.textContent = cardFields[key];
         }
-      });
+      }
+      if (field.classList.contains('popup__avatar')) {
+        field.src = checkedPin.author.avatar;
+      }
+
+      if (field.classList.contains('popup__features')) {
+        featureSet(field, checkedPin.offer.features);
+      }
+      if (field.classList.contains('popup__photos')) {
+        checkedPin.offer.photos.forEach(function (element) {
+          var newPhoto = field.children[0].cloneNode(true);
+          newPhoto.src = element;
+          field.appendChild(newPhoto);
+        });
+        field.children[0].style = 'display:none';
+      }
     });
 
-    mainCard.children[9].textContent = array[pinNumber].offer.description;
-
-    if (array[pinNumber].offer.photos.length !== 0) {
-      var popupPhotos = mainCard.children[10];
-      popupPhotos.children[0].src = array[pinNumber].offer.photos[0];
-      array[pinNumber].offer.photos.forEach(function (element, index) {
-        if (index > 0) {
-          var newPhoto = popupPhotos.children[0].cloneNode(true);
-          newPhoto.src = element;
-          popupPhotos.appendChild(newPhoto);
-        }
-      });
-    } else {
-      mainCard.removeChild(mainCard.children[10]);
-    }
     window.map.section.insertBefore(mainCard, window.map.section.children[1]);
     window.mainCard = mainCard;
   };
@@ -71,7 +76,7 @@
       target.classList.add('map__pin--active');
       Array.prototype.forEach.call(window.pins.mapPins.children, function (element, index) {
         if ((element === target) && (index > 1)) {
-          fillMainCard(array, index - DISABLE_ELEMENTS_QUANTITY);
+          fillMainCard(array[index - DISABLE_ELEMENTS_QUANTITY]);
           closePopup();
         } else {
           element.classList.remove('map__pin--active');
