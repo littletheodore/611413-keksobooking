@@ -2,7 +2,9 @@
 (function () {
   var Icon = {
     width: 50,
-    height: 70
+    height: 70,
+    halfWidth: 25,
+    halfHeight: 35
   };
 
   var mapPins = document.querySelector('.map__pins');
@@ -20,7 +22,7 @@
     }
     for (var i = 0; i < pinQuantity; i++) {
       var element = pinTemplate.cloneNode(true);
-      element.style = 'left:' + (array[i].location.x - window.pins.Icon.width / 2) + 'px; ' + 'top:' + (array[i].location.y - window.pins.Icon.height) + 'px;';
+      element.style = 'left:' + (array[i].location.x - window.pins.Icon.halfWidth) + 'px; ' + 'top:' + (array[i].location.y - window.pins.Icon.halfHeight) + 'px;';
       element.children[0].src = array[i].author.avatar;
       element.children[0].alt = array[i].offer.title;
       fragment.appendChild(element);

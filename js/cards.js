@@ -32,7 +32,7 @@
     var mainCard = cardTemplate.cloneNode(true);
     var cardFields = {
       'title': checkedPin.offer.title,
-      'text--address': checkedPin.offer.adress,
+      'text--address': checkedPin.offer.address,
       'text--price': checkedPin.offer.price + ' руб/ночь',
       'type': TypeVariant[checkedPin.offer.type],
       'text--capacity': checkedPin.offer.rooms + ' комнаты для ' + checkedPin.offer.guests + ' гостей',

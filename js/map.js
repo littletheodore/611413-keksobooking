@@ -6,12 +6,12 @@
   var MAIN_ICON_INDEX = 0;
   var MAP_FIELD = {
     width: {
-      min: 50,
-      max: document.body.clientWidth - 100
+      min: 20,
+      max: 1100
     },
     height: {
-      min: 130,
-      max: 630
+      min: 150,
+      max: 500
     },
   };
 

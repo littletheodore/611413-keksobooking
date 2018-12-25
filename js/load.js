@@ -2,12 +2,8 @@
 
 (function () {
   var GETDATAURL = 'https:js.dump.academy/keksobooking/data';
-  window.StatusCode = {
-    'Success': 200,
-    'Response redirection': 300,
-    'Response error': 400,
-    'Server error': 500
-  };
+  var TIMEOUT = 10000;
+
   window.load = function (onSuccess, onError) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
@@ -22,7 +18,6 @@
       onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
     });
 
-    var TIMEOUT = 10000;
     xhr.addEventListener('timeout', function () {
       if (xhr.timeout > TIMEOUT) {
         onError('Сервер не отвечает в течение' + xhr.timeout + 'мс');
@@ -30,5 +25,11 @@
     });
     xhr.open('GET', GETDATAURL);
     xhr.send();
+  };
+  window.StatusCode = {
+    'Success': 200,
+    'Response redirection': 300,
+    'Response error': 400,
+    'Server error': 500
   };
 })();
