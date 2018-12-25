@@ -1,75 +1,120 @@
 'use strict';
 (function () {
-  var adTitle = document.querySelector('#title');
-  adTitle.setAttribute('required', 'required');
-  adTitle.setAttribute('minlength', '3');
-  adTitle.setAttribute('maxlength', '100');
-  adTitle.addEventListener('input', function () {
-    if ((adTitle.value.length > adTitle.maxLength) || (adTitle.value.length < adTitle.minLength)) {
-      adTitle.setAttribute('style', 'outline: 5px solid red');
-    } else {
-      adTitle.removeAttribute('style', 'outline: 5px solid red');
-    }
-  });
-
   var TYPE_MIN_PRICE = {
     'palace': 10000,
     'flat': 1000,
     'house': 5000,
     'bungalo': 0
   };
-  var adForm = document.querySelector('.ad-form');
-  var adPrice = document.querySelector('#price');
-  var adType = document.querySelector('#type');
-  var checkedType = document.querySelector('#type>option:checked');
-  adPrice.setAttribute('required', 'required');
-  adPrice.setAttribute('type', 'number');
-  adPrice.setAttribute('max', '1000000');
-  adPrice.setAttribute('min', TYPE_MIN_PRICE[checkedType.value]);
-  adPrice.setAttribute('placeholder', TYPE_MIN_PRICE[checkedType.value]);
+  var DropVariant = ['dragenter', 'dragover', 'dragleave'];
+  var adTitle = window.map.adForm.querySelector('#title');
+  var adPrice = window.map.adForm.querySelector('#price');
+  var adType = window.map.adForm.querySelector('#type');
+  var adAvatar = window.map.adForm.querySelector('#avatar');
+  var adAvatarPic = window.map.adForm.querySelector('.ad-form-header__preview > img');
+  var checkedType = window.map.adForm.querySelector('#type>option:checked');
+  var adCheckIn = window.map.adForm.querySelector('#timein');
+  var adCheckOut = window.map.adForm.querySelector('#timeout');
+  var adRoomNumber = window.map.adForm.querySelector('#room_number');
+  var adCapacity = window.map.adForm.querySelector('#capacity');
+  var adPhoto = window.map.adForm.querySelector('#images');
+  var adPhotoPic = window.map.adForm.querySelector('.ad-form__photo');
+  var adAvatarDropZone = window.map.adForm.querySelector('.ad-form-header__drop-zone');
+  var adPhotosDropZone = window.map.adForm.querySelector('.ad-form__drop-zone');
+  var checkedRoomNumber = window.map.adForm.querySelector('#room_number>option:checked').value;
+  var resetButton = window.map.adForm.querySelector('button[type=reset]');
+
+  var selectReset = function (nodeList) {
+    Array.prototype.forEach.call(nodeList.children, function (element) {
+      element.selected = '';
+      element.disabled = '';
+    });
+  };
+
+  var checkInOutTimeSet = function (input, evt) {
+    selectReset(input);
+    var checkedTime = parseFloat(evt.target.value);
+    Array.prototype.forEach.call(input.children, function (element) {
+      if (parseFloat(element.value) === checkedTime) {
+        element.selected = 'selected';
+      } else {
+        element.selected = '';
+      }
+    });
+  };
+
+  var setAvailibleCapacity = function () {
+    var checkedRoomIndex = checkedRoomNumber % 10;
+    Array.prototype.forEach.call(adCapacity.children, function (element) {
+      element.selected = '';
+      element.disabled = 'disabled';
+      if (+element.value === checkedRoomIndex || element.value < checkedRoomIndex && element.value > 0) {
+        element.disabled = '';
+        element.selected = 'selected';
+      }
+    });
+  };
+
+  var previewImage = function (input, imgBox) {
+    var picContainer = imgBox.parentElement;
+    var FReader = new FileReader();
+    var newBox = imgBox.cloneNode(true);
+    FReader.readAsDataURL(input.files[0]);
+    FReader.onload = function (event) {
+      if (imgBox.tagName === 'IMG') {
+        imgBox.src = event.target.result;
+      } else {
+        var fragment = document.createDocumentFragment();
+        fragment.appendChild(newBox);
+        var newPic = document.createElement('img');
+        newBox.appendChild(newPic);
+        newPic.width = 70;
+        newPic.height = 70;
+        newPic.src = event.target.result;
+        picContainer.insertBefore(fragment, picContainer.children[1]);
+      }
+    };
+  };
+
+  adTitle.required = 'required';
+  adTitle.minLength = '30';
+  adTitle.maxLength = '100';
+  adTitle.addEventListener('input', function () {
+    if ((adTitle.value.length > adTitle.maxLength) || (adTitle.value.length < adTitle.minLength)) {
+      adTitle.style = 'outline: 5px solid red';
+    } else {
+      adTitle.style = '';
+    }
+  });
+
+  adPrice.required = 'required';
+  adPrice.type = 'number';
+  adPrice.max = 1000000;
+  adPrice.min = TYPE_MIN_PRICE[checkedType.value];
+  adPrice.placeholder = TYPE_MIN_PRICE[checkedType.value];
+
   adType.addEventListener('change', function (evt) {
     checkedType = evt.target.value;
-    adPrice.setAttribute('min', TYPE_MIN_PRICE[checkedType]);
-    adPrice.setAttribute('placeholder', TYPE_MIN_PRICE[checkedType]);
+    adPrice.min = TYPE_MIN_PRICE[checkedType];
+    adPrice.placeholder = TYPE_MIN_PRICE[checkedType];
   });
 
   adPrice.addEventListener('input', function () {
     var inputValue = parseFloat(adPrice.value);
     if ((inputValue < adPrice.min) || (inputValue > adPrice.max)) {
-      adPrice.setAttribute('style', 'outline: 5px solid red');
+      adPrice.style = 'outline: 5px solid red';
     } else {
-      adPrice.removeAttribute('style', 'outline: 5px solid red');
+      adPrice.style = '';
     }
   });
 
-  var adCheckIn = document.querySelector('#timein');
-  var adCheckOut = document.querySelector('#timeout');
   adCheckIn.addEventListener('change', function (evt) {
-    selectReset(adCheckOut);
-    var checkedTime = parseFloat(evt.target.value);
-    Array.prototype.forEach.call(adCheckOut.children, function (element) {
-      if (parseFloat(element.value) === checkedTime) {
-        element.setAttribute('selected', 'selected');
-      } else {
-        element.setAttribute('disabled', 'disabled');
-      }
-    });
+    checkInOutTimeSet(adCheckOut, evt);
   });
 
-  var adRoomNumber = document.querySelector('#room_number');
-  var adCapacity = document.querySelector('#capacity');
-  var checkedRoomNumber = document.querySelector('#room_number>option:checked').value;
-  var setAvailibleCapacity = function () {
-    var checkedRoomIndex = checkedRoomNumber % 10;
-    Array.prototype.forEach.call(adCapacity.children, function (element) {
-      element.removeAttribute('selected', 'selected');
-      element.setAttribute('disabled', 'disabled');
-      if (+element.value === checkedRoomIndex || element.value < checkedRoomIndex && element.value > 0) {
-        element.removeAttribute('disabled', 'disabled');
-        element.setAttribute('selected', 'selected');
-      }
-    });
-  };
+  adCheckOut.addEventListener('change', function (evt) {
+    checkInOutTimeSet(adCheckIn, evt);
+  });
 
   setAvailibleCapacity();
 
@@ -78,20 +123,46 @@
     setAvailibleCapacity();
   });
 
-  var selectReset = function (nodeList) {
-    Array.prototype.forEach.call(nodeList.children, function (element) {
-      element.removeAttribute('selected', 'selected');
-      element.removeAttribute('disabled', 'disabled');
-    });
-  };
-  var resetButton = document.querySelector('button[type=reset]');
   resetButton.addEventListener('click', function (evt) {
     evt.preventDefault();
-    adForm.reset();
-    window.map.activeModeOff();
-    window.mainPin.fillAdress(window.map.MAIN_PIN_START_COORDS.X, window.map.MAIN_PIN_START_COORDS.Y);
+    window.map.adForm.reset();
     selectReset(adCheckOut);
-    adPrice.removeAttribute('style', 'outline: 5px solid red');
-    adTitle.removeAttribute('style', 'outline: 5px solid red');
+    adPrice.style = '';
+    adTitle.style = '';
+    window.map.activeModeOff();
+    window.map.fillAdress(window.map.MAIN_PIN_START_COORDS.X, window.map.MAIN_PIN_START_COORDS.Y);
+  });
+
+  DropVariant.forEach(function (element) {
+    adAvatarDropZone.addEventListener(element, function (evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
+    });
+    adPhotosDropZone.addEventListener(element, function (evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
+    });
+  });
+
+  adAvatarDropZone.addEventListener('drop', function (evt) {
+    evt.preventDefault();
+    evt.stopPropagation();
+    var droppedImage = evt.dataTransfer;
+    previewImage(droppedImage, adAvatarPic);
+  });
+
+  adPhotosDropZone.addEventListener('drop', function (evt) {
+    evt.preventDefault();
+    evt.stopPropagation();
+    var droppedImage = evt.dataTransfer;
+    previewImage(droppedImage, adPhotoPic);
+  });
+
+  adAvatar.addEventListener('change', function () {
+    previewImage(adAvatar, adAvatarPic);
+  });
+
+  adPhoto.addEventListener('change', function () {
+    previewImage(adPhoto, adPhotoPic);
   });
 })();
