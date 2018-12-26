@@ -8,6 +8,7 @@
     'house': 'Дом',
     'bungalo': 'Бунгало'
   };
+  var DISABLE_ELEMENTS_QUANTITY = 2;
 
   var featureSet = function (field, checkedFeatures) {
     Array.prototype.forEach.call(field.children, function (feature) {
@@ -67,14 +68,13 @@
   };
 
   var popupAppear = function (array) {
-    var DISABLE_ELEMENTS_QUANTITY = 2;
     var onPinClickOpenPopup = function (evt) {
       var target = evt.target;
-      if (!(target.type === 'button')) {
+      if (target.tagName === 'IMG') {
         target = target.parentElement;
       }
       target.classList.add('map__pin--active');
-      Array.prototype.forEach.call(window.pins.mapPins.children, function (element, index) {
+      Array.prototype.forEach.call(window.pins.mapIcons.children, function (element, index) {
         if ((element === target) && (index > 1)) {
           fillMainCard(array[index - DISABLE_ELEMENTS_QUANTITY]);
           closePopup();
@@ -83,7 +83,7 @@
         }
       });
     };
-    window.pins.mapPins.addEventListener('click', onPinClickOpenPopup);
+    window.pins.mapIcons.addEventListener('click', onPinClickOpenPopup);
 
     var closePopup = function () {
       var onPopupCloseClick = document.querySelector('.popup__close');

@@ -1,5 +1,6 @@
 'use strict';
 (function () {
+  var URL = 'https://js.dump.academy/keksobooking';
   var TYPE_MIN_PRICE = {
     'palace': 10000,
     'flat': 1000,
@@ -7,6 +8,7 @@
     'bungalo': 0
   };
   var DropVariant = ['dragenter', 'dragover', 'dragleave'];
+  var main = document.querySelector('main');
   var adTitle = window.map.adForm.querySelector('#title');
   var adPrice = window.map.adForm.querySelector('#price');
   var adType = window.map.adForm.querySelector('#type');
@@ -23,6 +25,9 @@
   var adPhotosDropZone = window.map.adForm.querySelector('.ad-form__drop-zone');
   var checkedRoomNumber = window.map.adForm.querySelector('#room_number>option:checked').value;
   var resetButton = window.map.adForm.querySelector('button[type=reset]');
+
+  var successMessage = document.querySelector('#success').content.querySelector('div');
+  var errorMessage = document.querySelector('#error').content.querySelector('div');
 
   var selectReset = function (nodeList) {
     Array.prototype.forEach.call(nodeList.children, function (element) {
@@ -41,6 +46,11 @@
         element.selected = '';
       }
     });
+  };
+  var setPrice = function () {
+    checkedType = window.map.adForm.querySelector('#type>option:checked');
+    adPrice.min = TYPE_MIN_PRICE[checkedType.value];
+    adPrice.placeholder = TYPE_MIN_PRICE[checkedType.value];
   };
 
   var setAvailibleCapacity = function () {
@@ -76,6 +86,41 @@
     };
   };
 
+  var onEscCloseSuccessMessage = function (evt) {
+    if (evt.keyCode === window.ESC_KEYCODE) {
+      main.removeChild(successMessage);
+      document.removeEventListener('keydown', onEscCloseSuccessMessage);
+    }
+  };
+  var onClickCloseSuccessMessage = function () {
+    main.removeChild(successMessage);
+    successMessage.removeEventListener('click', onClickCloseSuccessMessage);
+    document.removeEventListener('keydown', onEscCloseSuccessMessage);
+  };
+
+  var onEscCloseErrorMessage = function (evt) {
+    if (evt.keyCode === window.ESC_KEYCODE) {
+      main.removeChild(errorMessage);
+      document.removeEventListener('keydown', onEscCloseErrorMessage);
+    }
+  };
+  var onClickCloseErrorMessage = function () {
+    main.removeChild(errorMessage);
+    errorMessage.removeEventListener('click', onClickCloseErrorMessage);
+    document.removeEventListener('keydown', onEscCloseErrorMessage);
+  };
+
+
+  var errorFormUpload = function () {
+    main.appendChild(errorMessage);
+    var errorMessageCloseButton = document.querySelector('.error__button');
+    document.addEventListener('keydown', onEscCloseErrorMessage);
+    errorMessageCloseButton.addEventListener('click', onClickCloseErrorMessage);
+  };
+
+
+  window.map.adForm.action = 'https://js.dump.academy/keksobooking';
+
   adTitle.required = 'required';
   adTitle.minLength = '30';
   adTitle.maxLength = '100';
@@ -90,8 +135,8 @@
   adPrice.required = 'required';
   adPrice.type = 'number';
   adPrice.max = 1000000;
-  adPrice.min = TYPE_MIN_PRICE[checkedType.value];
-  adPrice.placeholder = TYPE_MIN_PRICE[checkedType.value];
+
+  setPrice();
 
   adType.addEventListener('change', function (evt) {
     checkedType = evt.target.value;
@@ -123,15 +168,6 @@
     setAvailibleCapacity();
   });
 
-  resetButton.addEventListener('click', function (evt) {
-    evt.preventDefault();
-    window.map.adForm.reset();
-    selectReset(adCheckOut);
-    adPrice.style = '';
-    adTitle.style = '';
-    window.map.activeModeOff();
-    window.map.fillAdress(window.map.MAIN_PIN_START_COORDS.X, window.map.MAIN_PIN_START_COORDS.Y);
-  });
 
   DropVariant.forEach(function (element) {
     adAvatarDropZone.addEventListener(element, function (evt) {
@@ -165,4 +201,44 @@
   adPhoto.addEventListener('change', function () {
     previewImage(adPhoto, adPhotoPic);
   });
+
+  window.upload = function (data, onSuccess) {
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = 'json';
+    xhr.addEventListener('load', function () {
+      if (xhr.status === window.StatusCode.Success) {
+        onSuccess(xhr.response);
+      } else {
+        errorFormUpload();
+      }
+    });
+    xhr.open('POST', URL);
+    xhr.send(data);
+  };
+
+  window.map.adForm.addEventListener('submit', function (evt) {
+    window.upload(new FormData(window.map.adForm), function () {
+      main.appendChild(successMessage);
+      document.addEventListener('keydown', onEscCloseSuccessMessage);
+      successMessage.addEventListener('click', onClickCloseSuccessMessage);
+      window.map.adForm.reset();
+      setAvailibleCapacity();
+      setPrice();
+      selectReset(adRoomNumber);
+      window.map.activeModeOff();
+      window.map.fillAdress(window.map.MAIN_PIN_START_COORDS.X, window.map.MAIN_PIN_START_COORDS.Y);
+    });
+    evt.preventDefault();
+  });
+
+  resetButton.addEventListener('click', function (evt) {
+    evt.preventDefault();
+    window.map.adForm.reset();
+    selectReset(adCheckOut);
+    adPrice.style = '';
+    adTitle.style = '';
+    window.map.activeModeOff();
+    window.map.fillAdress(window.map.MAIN_PIN_START_COORDS.X, window.map.MAIN_PIN_START_COORDS.Y);
+  });
+
 })();

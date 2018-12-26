@@ -7,7 +7,7 @@
     halfHeight: 35
   };
 
-  var mapPins = document.querySelector('.map__pins');
+  var mapIcons = document.querySelector('.map__pins');
   var pinTemplate = document.querySelector('#pin').content.querySelector('button');
   var fragment = document.createDocumentFragment();
 
@@ -16,7 +16,7 @@
     if (pins) {
       pins.forEach(function (element, index) {
         if (index !== window.map.MAIN_ICON_INDEX) {
-          window.pins.mapPins.removeChild(element);
+          window.pins.mapIcons.removeChild(element);
         }
       });
     }
@@ -26,11 +26,11 @@
       element.children[0].src = array[i].author.avatar;
       element.children[0].alt = array[i].offer.title;
       fragment.appendChild(element);
-      window.pins.mapPins.appendChild(fragment);
+      window.pins.mapIcons.appendChild(fragment);
     }
   };
   window.pins = {
-    'mapPins': mapPins,
+    'mapIcons': mapIcons,
     'Icon': Icon,
     'drawing': drawing,
   };
