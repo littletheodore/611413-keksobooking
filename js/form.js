@@ -234,6 +234,9 @@
   resetButton.addEventListener('click', function (evt) {
     evt.preventDefault();
     window.map.adForm.reset();
+    setAvailibleCapacity();
+    setPrice();
+    selectReset(adRoomNumber);
     selectReset(adCheckOut);
     adPrice.style = '';
     adTitle.style = '';

@@ -71,7 +71,12 @@
 
   window.map.filtersForm.addEventListener('change', function (evt) {
     if (evt.target.name === 'features') {
-      userFilter['housing-features'].push(evt.target.value);
+      var isFeatureSet = userFilter['housing-features'].indexOf(evt.target.value);
+      if (isFeatureSet === -1) {
+        userFilter['housing-features'].push(evt.target.value);
+      } else {
+        userFilter['housing-features'].splice(isFeatureSet, 1);
+      }
     } else {
       userFilter[evt.target.name] = evt.target.value;
     }
